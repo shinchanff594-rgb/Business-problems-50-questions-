@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="hi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Master - 50 MCQ Challenge</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @keyframes monkeyDance {
+            0%, 100% { transform: translateY(0) rotate(-10deg) scale(1); }
+            50% { transform: translateY(-18px) rotate(12deg) scale(1.15); }
+        }
+        .animate-monkey {
+            animation: monkeyDance 0.6s infinite ease-in-out;
+        }
+
+        @keyframes handNo {
+            0% { transform: translateY(-40px) rotate(-30deg); opacity: 0; }
+            50% { transform: translateY(0) rotate(20deg); opacity: 1; }
+            75% { transform: translateY(0) rotate(-20deg); opacity: 1; }
+            100% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        }
+        .animate-hand {
+            animation: handNo 0.8s ease-out forwards;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(59, 130, 246, 0.5); }
+            50% { shadow: 0 0 30px rgba(59, 130, 246, 0.9); }
+        }
+        .glow-effect {
+            animation: pulseGlow 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased min-h-screen flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+
+    <!-- Top Navigation Header -->
+    <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 sticky top-0 z-40">
+        <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer" id="logoClickArea">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-blue-500/30">
+                    BM
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg text-white leading-tight">Business Master <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">50 MCQ</span></h1>
+                    <p class="text-xs text-slate-400">असली बिज़नेस समस्याओं का मास्टर टेस्ट</p>
+                </div>
+            </div>
+
+            <!-- Header Action Buttons -->
+            <div class="flex items-center gap-2">
+                <button id="adminLoginBtn" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-slate-300 border border-slate-600 transition-colors flex items-center gap-1.5">
+                    <i class="fas fa-user-shield text-amber-400"></i>
+                    <span>Admin Panel</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Notification Toast / Modal -->
+    <div id="toastNotification" class="fixed top-20 right-5 z-50 transform translate-x-80 opacity-0 transition-all duration-300 bg-slate-800 border border-slate-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+        <i id="toastIcon" class="fas fa-info-circle text-blue-400 text-lg"></i>
+        <span id="toastMessage" class="text-xs font-medium">अधिसूचना संदेश</span>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full space-y-4 text-center shadow-2xl">
+            <div class="w-12 h-12 mx-auto rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">डेटा रिसेट करें?</h3>
+            <p class="text-xs text-slate-300">क्या आप वाकई सारा यूज़र डेटा डिलीट करना चाहते हैं? यह वापस नहीं लाया जा सकता।</p>
+            <div class="flex gap-2">
+                <button id="cancelConfirmBtn" class="w-1/2 py-2 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600">रद्द करें</button>
+                <button id="acceptConfirmBtn" class="w-1/2 py-2 rounded-xl text-xs font-semibold bg-rose-600 text-white hover:bg-rose-500 font-bold">हटाएं (Delete)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6 my-auto">
+
+        <!-- SCREEN 1: Welcome & Login Screen -->
+        <div id="welcomeScreen" class="bg-slate-800 border border-slate-700 rounded-3xl p-6 sm:p-10 shadow-2xl text-center relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-60 h-60 bg-blue-500/10 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-24 -left-24 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl"></div>
+
+            <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-4xl text-white shadow-xl glow-effect">
+                <i class="fas fa-crown"></i>
+            </div>
+
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                स्वागत है <span class="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">Business Master</span> में!
+            </h2>
+            <p class="mt-4 text-slate-300 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                क्या आप असली बिज़नेस समस्याओं को हल करने के लिए तैयार हैं? इस टेस्ट में 50 रियल-लाइफ बिज़नेस सवाल हैं जो आपके दिमाग की कसरत कराएंगे और आपको एक असली बिज़नेस मास्टर बनाएंगे!
+            </p>
+
+            <!-- User Registration Form -->
+            <div class="mt-8 max-w-md mx-auto bg-slate-900/80 border border-slate-700/80 p-6 rounded-2xl shadow-inner text-left">
+                <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4 text-center">शुरू करने के लिए अपनी जानकारी भरें</h3>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">आपका नाम (Full Name) *</label>
+                        <input type="text" id="inputName" required placeholder="अपना नाम लिखें..." class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1">मोबाइल नंबर / ईमेल *</label>
+                        <input type="text" id="inputContact" required placeholder="उदा. 9876543210 या email@example.com" class="w-full px-4 py-3 rounded-xl bg-slate-800 border border-slate-600 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 text-sm">
+                    </div>
+                    <button id="startQuizBtn" class="w-full py-4 px-6 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2 text-base">
+                        <span>टेस्ट शुरू करें (Start 50 MCQs)</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: MCQ Quiz Interface -->
+        <div id="quizScreen" class="hidden space-y-6">
+            
+            <!-- Progress Bar & Stats -->
+            <div class="bg-slate-800 border border-slate-700 p-4 sm:p-5 rounded-2xl shadow-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-4">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-400">प्रगति (Progress):</span>
+                    <span id="questionCounter" class="text-sm font-extrabold px-3 py-1 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        सवाल 1 / 50
+                    </span>
+                </div>
+
+                <div class="w-full sm:w-1/2 bg-slate-700 h-3 rounded-full overflow-hidden">
+                    <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-indigo-500 h-full w-2% transition-all duration-300"></div>
+                </div>
+
+                <div class="flex items-center gap-4 text-xs font-semibold">
+                    <span class="text-emerald-400"><i class="fas fa-check-circle"></i> सही: <strong id="scoreCorrect">0</strong></span>
+                    <span class="text-rose-400"><i class="fas fa-times-circle"></i> ग़लत: <strong id="scoreWrong">0</strong></span>
+                </div>
+            </div>
+
+            <!-- Reaction Box (Monkey / Hand Animation) -->
+            <div id="reactionBox" class="hidden bg-slate-800/90 border border-slate-700 p-4 rounded-2xl text-center relative overflow-hidden shadow-xl">
+                <!-- Correct Answer: Dancing Monkey -->
+                <div id="correctReaction" class="hidden flex flex-col items-center justify-center py-2">
+                    <div class="text-3xl font-black text-amber-400 animate-bounce mb-2">
+                        🎉 Congratulations! 🎉
+                    </div>
+                    <div class="text-6xl animate-monkey my-2">
+                        🐒
+                    </div>
+                    <p class="text-sm text-emerald-400 font-bold mt-1">
+                        शाबाश! आपका जवाब बिल्कुल सही है!
+                    </p>
+                </div>
+
+                <!-- Wrong Answer: Waving Hand -->
+                <div id="wrongReaction" class="hidden flex flex-col items-center justify-center py-2">
+                    <div class="text-6xl animate-hand my-2">
+                        ✋
+                    </div>
+                    <div class="text-lg font-bold text-rose-400">
+                        अरे! कोई बात नहीं... (No worries!)
+                    </div>
+                    <p class="text-xs text-slate-300 mt-1">
+                        गलतियों से ही असली बिजनेसमैन सीखता है। नीचे दिए गए उत्तर का कारण ध्यान से पढ़ें!
+                    </p>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-slate-800 border border-slate-700 p-6 sm:p-8 rounded-3xl shadow-xl space-y-6">
+                <div class="flex items-start gap-3">
+                    <span class="w-8 h-8 rounded-lg bg-blue-600/30 text-blue-400 flex items-center justify-center font-bold text-sm shrink-0 mt-0.5">
+                        <i class="fas fa-question"></i>
+                    </span>
+                    <h3 id="questionText" class="text-lg sm:text-xl font-bold text-white leading-snug">
+                        लोड हो रहा है...
+                    </h3>
+                </div>
+
+                <!-- Options List -->
+                <div id="optionsContainer" class="space-y-3">
+                    <!-- Options populated via JS -->
+                </div>
+
+                <!-- Detailed Explanation Box -->
+                <div id="explanationBox" class="hidden bg-slate-900/90 border-l-4 border-blue-500 p-4 sm:p-5 rounded-r-2xl space-y-2">
+                    <div id="expStatusHeader" class="text-sm font-bold flex items-center gap-2">
+                        <!-- Header text -->
+                    </div>
+                    <p id="explanationText" class="text-sm text-slate-300 leading-relaxed">
+                        <!-- Explanation text -->
+                    </p>
+                </div>
+
+                <!-- Next Question Button -->
+                <div class="flex justify-end pt-2">
+                    <button id="nextBtn" class="hidden px-6 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-500 shadow-lg shadow-blue-600/30 transition-all items-center gap-2">
+                        <span>अगला सवाल (Next Question)</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: Completion & Good Screen -->
+        <div id="completionScreen" class="hidden bg-slate-800 border border-slate-700 rounded-3xl p-8 sm:p-12 shadow-2xl text-center relative overflow-hidden space-y-6">
+            <div class="w-24 h-24 mx-auto rounded-full bg-emerald-500/20 text-emerald-400 border-2 border-emerald-500 flex items-center justify-center text-5xl">
+                <i class="fas fa-check-double"></i>
+            </div>
+
+            <h2 class="text-3xl sm:text-4xl font-extrabold text-white">
+                Good! शाबाश! 🎉
+            </h2>
+            <p class="text-lg text-slate-300 max-w-xl mx-auto">
+                आपने <strong class="text-amber-400">Business Master</strong> के सभी 50 सवालों का टेस्ट सफलता से पूरा कर लिया है!
+            </p>
+
+            <!-- Final Scorecard -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto py-4">
+                <div class="p-4 rounded-2xl bg-slate-900 border border-slate-700">
+                    <div class="text-xs text-slate-400">कुल सवाल</div>
+                    <div class="text-2xl font-black text-white mt-1">50</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-900 border border-slate-700">
+                    <div class="text-xs text-slate-400">सही उत्तर</div>
+                    <div id="finalCorrect" class="text-2xl font-black text-emerald-400 mt-1">0</div>
+                </div>
+                <div class="p-4 rounded-2xl bg-slate-900 border border-slate-700">
+                    <div class="text-xs text-slate-400">सफलता दर (Accuracy)</div>
+                    <div id="finalAccuracy" class="text-2xl font-black text-blue-400 mt-1">0%</div>
+                </div>
+            </div>
+
+            <div class="p-4 bg-blue-900/30 border border-blue-500/40 rounded-2xl text-sm text-blue-200 max-w-xl mx-auto">
+                💡 <strong>बिज़नेस मंत्र:</strong> असली बिजनेस में कोई स्थायी असफलता नहीं होती, केवल सीखने का अवसर होता है। इन 50 नियमों को अपने जीवन में लागू करें!
+            </div>
+
+            <button id="retakeQuizBtn" class="px-8 py-3.5 rounded-xl font-bold text-white bg-slate-700 hover:bg-slate-600 transition-all border border-slate-600">
+                <i class="fas fa-redo mr-2"></i> दोबारा टेस्ट दें (Retake Quiz)
+            </button>
+        </div>
+
+        <!-- SCREEN 4: Secret Owner / Admin Panel -->
+        <div id="adminPanel" class="hidden space-y-6">
+            <div class="bg-slate-800 border border-slate-700 p-6 rounded-3xl shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-white flex items-center gap-2">
+                        <i class="fas fa-user-shield text-amber-400"></i>
+                        <span>Owner Analytics Dashboard</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">केवल आपके लिए: ऐप यूज़र्स की पूरी रिपोर्ट और आंकड़े</p>
+                </div>
+                <button id="closeAdminBtn" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-300 bg-slate-700 hover:bg-slate-600 border border-slate-600">
+                    <i class="fas fa-times mr-1"></i> बंद करें (Exit Admin)
+                </button>
+            </div>
+
+            <!-- Admin Stats Overview -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="p-5 rounded-2xl bg-slate-800 border border-slate-700">
+                    <div class="text-xs font-semibold text-slate-400 uppercase">कुल विजिटर्स (Total Users)</div>
+                    <div id="adminTotalUsers" class="text-3xl font-black text-white mt-2">0</div>
+                </div>
+                <div class="p-5 rounded-2xl bg-slate-800 border border-slate-700">
+                    <div class="text-xs font-semibold text-slate-400 uppercase">पूरा करने वाले (Completed)</div>
+                    <div id="adminCompletedUsers" class="text-3xl font-black text-emerald-400 mt-2">0</div>
+                </div>
+                <div class="p-5 rounded-2xl bg-slate-800 border border-slate-700">
+                    <div class="text-xs font-semibold text-slate-400 uppercase">औसत स्कोर (Avg Score)</div>
+                    <div id="adminAvgScore" class="text-3xl font-black text-blue-400 mt-2">0/50</div>
+                </div>
+                <div class="p-5 rounded-2xl bg-slate-800 border border-slate-700">
+                    <div class="text-xs font-semibold text-slate-400 uppercase">कुल सवाल हल (Total Attempted)</div>
+                    <div id="adminTotalAttempts" class="text-3xl font-black text-amber-400 mt-2">0</div>
+                </div>
+            </div>
+
+            <!-- Detailed Users Table -->
+            <div class="bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-xl space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-white">यूजर्स का विवरण (User Activity Log)</h3>
+                    <button id="clearDataBtn" class="text-xs px-3 py-1.5 rounded-lg bg-rose-900/50 hover:bg-rose-800 text-rose-300 border border-rose-700 transition-colors">
+                        <i class="fas fa-trash-alt mr-1"></i> डेटा साफ़ करें (Reset Data)
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-300 border-collapse">
+                        <thead>
+                            <tr class="bg-slate-900 text-slate-400 uppercase border-b border-slate-700">
+                                <th class="p-3">#</th>
+                                <th class="p-3">नाम (Name)</th>
+                                <th class="p-3">संपर्क (Contact)</th>
+                                <th class="p-3">स्थिति (Status)</th>
+                                <th class="p-3">सही (Correct)</th>
+                                <th class="p-3">गलत (Wrong)</th>
+                                <th class="p-3">स्कोर %</th>
+                                <th class="p-3">समय (Timestamp)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUserTableBody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800/80 border-t border-slate-700/80 py-4 text-center text-xs text-slate-500">
+        &copy; 2026 Business Master App | Built for Real-life Business Problem Solving
+    </footer>
+
+    <!-- Secret Admin PIN Modal -->
+    <div id="adminPinModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6 max-w-sm w-full space-y-4 text-center shadow-2xl">
+            <div class="w-12 h-12 mx-auto rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center text-xl">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white">Owner Security Access</h3>
+            <p class="text-xs text-slate-400">मालिक/ओनर डैशबोर्ड खोलने के लिए गुप्त पासकोड दर्ज करें:</p>
+            <input type="password" id="adminPinInput" placeholder="पासकोड (Passcode)..." class="w-full px-4 py-2.5 rounded-xl bg-slate-900 border border-slate-600 text-white text-center font-bold tracking-widest text-sm focus:outline-none focus:border-amber-500">
+            <div id="pinErrorMsg" class="text-xs text-rose-400 hidden">गलत पासकोड! दोबारा प्रयास करें।</div>
+            <div class="flex gap-2">
+                <button id="cancelPinBtn" class="w-1/2 py-2 rounded-xl text-xs font-semibold bg-slate-700 text-slate-300 hover:bg-slate-600">रद्द करें</button>
+                <button id="submitPinBtn" class="w-1/2 py-2 rounded-xl text-xs font-semibold bg-amber-500 text-slate-900 hover:bg-amber-400 font-bold">लॉगिन करें</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript App Logic -->
+    <script>
+        // Questions Data
+        const questionsData = [{"q": "1. आपकी दुकान/बिजनेस में ग्राहक सामान तो देखते हैं लेकिन बिना खरीदे चले जाते हैं। सबसे पहला कदम क्या होना चाहिए?", "options": ["तुरंत दाम 50% कम कर देना", "ग्राहकों से प्यार से कारण पूछना और फ़ीडबैक लेना", "दुकान बंद करके कहीं और खोलना", "महंगे विज्ञापन (Ads) चलाना शुरू करना"], "ans": 1, "exp": "सही कदम ग्राहकों से विनम्रतापूर्वक फीडबैक लेना है। बिना समस्या समझे दाम घटाना या विज्ञापन पर पैसे खर्च करना नुकसान पहुँचा सकता है।"}, {"q": "2. बिजनेस शुरू करते समय सबसे पहला और महत्वपूर्ण ध्यान किस चीज़ पर होना चाहिए?", "options": ["फैंसी ऑफिस और महंगा फर्नीचर खरीदना", "ग्राहक की असली समस्या को हल करना (Product-Market Fit)", "पहले दिन से बड़ा स्टाफ रख लेना", "केवल ब्रांड लोगो पर लाखों रुपये खर्च करना"], "ans": 1, "exp": "बिजनेस तभी चलता है जब वह ग्राहकों की किसी असली समस्या (Pain Point) का समाधान करता है। ऑफिस या फर्नीचर बाद की चीजें हैं।"}, {"q": "3. अगर आपका कैश फ्लो (Cash Flow) कम हो रहा है और उधार बढ़ता जा रहा है, तो क्या करना चाहिए?", "options": ["उधार देना तुरंत बंद करना और पुराने बकाये की सख्त वसूली करना", "और ज्यादा लोगों को उधार पर सामान देना", "नया बैंक लोन लेकर पर्सनल खर्चे करना", "उधार भूलकर नए कस्टमर ढूंढना"], "ans": 0, "exp": "कैश फ्लो ही बिजनेस का खून है। क्रेडिट लिमिट तय करें, एडवांस पेमेंट माँगें और बकाये की तुरंत वसूली करें।"}, {"q": "4. नया प्रोडक्ट लॉन्च करते समय रिस्क कम करने के लिए क्या तरीका सही है?", "options": ["लाखों पीस एक साथ बनाकर मार्केट में उतार देना", "कम लागत में MVP (Minimum Viable Product) बनाकर टेस्टिंग करना", "बिना किसी से पूछे सीधा भारी प्रोडक्शन चालू करना", "सिर्फ दोस्तों की सलाह पर बड़ा इन्वेस्ट करना"], "ans": 1, "exp": "MVP बनाकर पहले छोटे मार्केट में टेस्ट करें। इससे ग्राहकों की पसंद का पता चलता है और भारी वित्तीय नुकसान से बचाव होता है।"}, {"q": "5. प्रतिस्पर्धी (Competitor) आपकी दुकान से सस्ता सामान बेच रहा है, आप क्या करेंगे?", "options": ["बिना सोचे-समझे उससे भी सस्ते दाम पर बेचकर घाटा सहना", "अपनी क्वालिटी, सर्विस और कस्टमर एक्सपीरियंस को बेहतर बनाना", "कंपटीटर से झगड़ा करना", "बिजनेस तुरंत बंद कर देना"], "ans": 1, "exp": "प्राइस वॉर में छोटी दुकानें डूब जाती हैं। वैल्यू एडिशन, बेहतर सर्विस और कस्टमर रिलेशन से ही कंपटीटर को हराया जा सकता है।"}, {"q": "6. पुराने ग्राहकों को बनाए रखना (Customer Retention) क्यों ज़रूरी है?", "options": ["क्योंकि नए ग्राहक लाने में 5 से 7 गुना ज्यादा खर्च आता है", "पुराने ग्राहकों को कोई फायदा नहीं होता", "पुराने ग्राहक हमेशा शिकायत करते हैं", "इससे बिजनेस में कोई फ़र्क नहीं पड़ता"], "ans": 0, "exp": "पुराने ग्राहकों को रिपीट सेल देना सस्ता और आसान होता है। वफादार ग्राहक माउथ-टू-माउथ पब्लिसिटी भी करते हैं।"}, {"q": "7. बिजनेस में इमरजेंसी फंड (Emergency Fund) कितना होना चाहिए?", "options": ["कम से कम 3 से 6 महीने के फिक्स्ड खर्चों के बराबर", "बिल्कुल नहीं होना चाहिए", "केवल 1 दिन का खर्च", "सब पैसा स्टॉक में फंसा देना चाहिए"], "ans": 0, "exp": "मंदी, महामारी या अप्रत्याशित संकट के समय 3-6 महीने का रिजर्व फंड बिजनेस को बंद होने से बचाता है।"}, {"q": "8. कर्मचारी (Employees) को प्रेरित (Motivate) रखने का सबसे अच्छा तरीका क्या है?", "options": ["सही समय पर सैलरी, सम्मान और परफॉरमेंस इंसेंटिव देना", "हर वक्त डांटते रहना और दबाव बनाना", "उनकी सलाह को पूरी तरह नजरअंदाज करना", "ओवरटाइम कराकर पैसे न देना"], "ans": 0, "exp": "खुश और प्रेरित कर्मचारी ही आपके बिजनेस को आगे बढ़ाते हैं। निष्पक्ष इंसेंटिव और वर्क-लाइफ बैलेंस बहुत जरूरी है।"}, {"q": "9. डिजिटल मार्केटिंग (Digital Marketing) का सबसे बड़ा फायदा क्या है?", "options": ["टारगेटेड ऑडियंस तक कम खर्च में पहुँचना और रिजल्ट ट्रैक करना", "यह सिर्फ बड़ी कंपनियों के लिए होती है", "इसमें कभी कोई बिक्री नहीं होती", "यह बहुत महंगी और बेकार होती है"], "ans": 0, "exp": "डिजिटल मार्केटिंग से आप सही उम्र, स्थान और रुचि वाले ग्राहकों तक सीधे पहुँच सकते हैं और हर रुपये का ROI माप सकते हैं।"}, {"q": "10. बिजनेस का हिसाब-किताब (Accounting) कब और कैसे रखना चाहिए?", "options": ["रोजाना बिलिंग और डिजिटल/सॉफ्टवेयर में हर लेन-देन दर्ज करके", "साल में एक बार अंदाज से लिखना", "याददाश्त पर भरोसा करके कहीं न लिखना", "सिर्फ पर्चियों को फेंक देना"], "ans": 0, "exp": "दैनिक ट्रैकिंग से पता चलता है कि असली प्रॉफिट कितना है और कहाँ फालतू खर्चे (Leakage) हो रहे हैं।"}, {"q": "11. 'यूनिट इकोनॉमिक्स' (Unit Economics) सही होने का क्या मतलब है?", "options": ["हर एक प्रोडक्ट/सर्विस को बेचने पर सीधे मुनाफा होना", "हर प्रोडक्ट को घाटे में बेचना", "बिना लागत जाने सामान बेचना", "फ्री में सारा सामान बांटना"], "ans": 0, "exp": "अगर प्रति यूनिट बिक्री पर ही नुकसान हो रहा है, तो बिजनेस का स्केल बड़ा होने पर नुकसान भी उतना ही बड़ा हो जाएगा।"}, {"q": "12. इन्वेंटरी (Stock) मैनेजमेंट में कौन सी गलती बिजनेस डुबो सकती है?", "options": ["जरूरत से ज्यादा डेड स्टॉक (Dead Stock) जमा कर लेना", "स्टॉक की रेगुलर चेकिंग करना", "फास्ट-सेलिंग सामान का बैकअप रखना", "सप्लायर से सही समय पर माल मंगाना"], "ans": 0, "exp": "अनबिका माल पैसे को फंसा देता है और एक्सपायरी या ऑब्सोलिट होने पर सीधा नुकसान कराता है।"}, {"q": "13. कस्टमर केयर (Customer Support) में शिकायत आने पर क्या करना चाहिए?", "options": ["शांति से सुनना, तुरंत माफी माँगना और समाधान देना", "कस्टमर पर चिल्लाना और गलती न मानना", "कस्टमर का फोन ब्लॉक कर देना", "शिकायत को टालते रहना"], "ans": 0, "exp": "एक असंतुष्ट ग्राहक की समस्या तुरंत हल करने से वह आपका सबसे वफादार ब्रांड एंबेसडर बन सकता है।"}, {"q": "14. पार्टनरशिप (Partnership) में बिजनेस शुरू करते समय सबसे जरूरी क्या है?", "options": ["लिखित में Legal Partnership Agreement बनाना जिसमें रोल और प्रॉफिट क्लियर हो", "केवल जबानी वादों पर काम करना", "सारे पैसे एक ही पार्टनर से लगवाना बिना एग्रीमेंट के", "बिना काम बांटे काम शुरू कर देना"], "ans": 0, "exp": "भविष्य के विवादों से बचने के लिए लिखित कॉन्ट्रैक्ट में जिम्मेदारियां, प्रॉफिट शेयरिंग और एग्जिट क्लॉज होना अनिवार्य है।"}, {"q": "15. 'Cross-Selling' का क्या अर्थ है?", "options": ["मुख्य प्रोडक्ट के साथ उससे जुड़ा दूसरा प्रोडक्ट भी बेचना (जैसे जूते के साथ पॉलिश)", "सामान बेचने से मना करना", "दुकान बंद करना", "सामान पर डिस्काउंट हटाना"], "ans": 0, "exp": "क्रॉस-सेलिंग से प्रति ग्राहक औसत बिल वैल्यू (Average Order Value) बढ़ती है।"}, {"q": "16. बिजनेस की ग्रोथ के लिए री-इन्वेस्टमेंट (Re-investment) क्यों जरूरी है?", "options": ["मुनाफे का हिस्सा बिजनेस के विस्तार, टेक्नोलॉजी और मार्केटिंग में लगाने के लिए", "सारा मुनाफा पहले दिन पर्सनल ऐशो-आराम में उड़ाने के लिए", "पैसा बैंक में बंद रखने के लिए", "कर्मचारियों की सैलरी काटने के लिए"], "ans": 0, "exp": "शुरुआती सालों में प्रॉफिट को बिजनेस में वापस लगाने से बिजनेस तेजी से स्केल करता है।"}, {"q": "17. 'USP' (Unique Selling Proposition) क्या होती है?", "options": ["आपकी वह खास खूबी जो आपको कंपटीटर से अलग बनाती है", "सरकारी टैक्स का नाम", "दुकान का पता", "दुकान में रखी बेकार चीज़"], "ans": 0, "exp": "USP (जैसे सबसे तेज़ डिलीवरी, 24x7 सपोर्ट, अनोखी क्वालिटी) ही ग्राहकों को आपके पास खींचती है।"}, {"q": "18. सोशल मीडिया पर नेगेटिव रिव्यू (Negative Review) आने पर क्या करें?", "options": ["पब्लिकली विनम्र जवाब दें और इनबॉक्स में समस्या का समाधान करें", "कमेंट डिलीट करके यूजर को गाली दें", "सोशल मीडिया अकाउंट बंद कर दें", "रिव्यू देने वाले पर केस कर दें"], "ans": 0, "exp": "नेगेटिव रिव्यू पर सही प्रोफेशनल रिस्पॉन्स से बाकी लोगों में आपके ब्रांड के प्रति भरोसा बढ़ता है।"}, {"q": "19. सेल्स फनल (Sales Funnel) का पहला चरण क्या होता है?", "options": ["जागरूकता (Awareness) - लोगों को आपके ब्रांड के बारे में पता चलना", "सीधा पेमेंट लेना", "सामान वापस करना", "डिस्काउंट माँगना"], "ans": 0, "exp": "जब तक लोग आपके बारे में जानेंगे नहीं, वे खरीदेंगे नहीं। इसलिए अवेयरनेस पहला कदम है।"}, {"q": "20. बिजनेस में डेलीगेशन (Delegation) का क्या मतलब है?", "options": ["रूटीन काम टीम को सौंपना ताकि आप बिजनेस की ग्रोथ पर ध्यान दे सकें", "सारे काम अकेले ही करते रहना", "काम छोड़कर सो जाना", "कर्मचारियों को काम करने से रोकना"], "ans": 0, "exp": "एक सफल बिजनेसमैन हर काम खुद नहीं करता, बल्कि सही लोगों को जिम्मेदारी सौंपता है।"}, {"q": "21. सीजनल बिजनेस (Seasonal Business) में ऑफ-सीजन में क्या रणनीति होनी चाहिए?", "options": ["ऑफ-सीजन प्रोडक्ट्स जोड़ना और खर्चे नियंत्रित रखना", "साल भर एक जैसा स्टॉक भरकर रखना", "ऑफ-सीजन में बिना काम के भारी स्टाफ रखना", "दुकान permanently बंद कर देना"], "ans": 0, "exp": "ऑफ-सीजन में अल्टरनेटिव प्रोडक्ट्स (जैसे सर्दियों में सूप, गर्मियों में आइसक्रीम) बेचने से कैश फ्लो बना रहता है।"}, {"q": "22. ब्रांडिंग (Branding) केवल लोगो (Logo) नहीं है, बल्कि और क्या है?", "options": ["ग्राहक का आपके बिजनेस के प्रति अनुभव, भरोसा और भावना", "सिर्फ एक सुंदर विजिटिंग कार्ड", "एक महंगा बोर्ड लगाना", "टेलीविजन पर एड देना"], "ans": 0, "exp": "ब्रांडिंग वह पहचान है जो ग्राहक के दिमाग में आपके व्यवहार, क्वालिटी और वादे को पूरा करने से बनती है।"}, {"q": "23. सप्लायर (Supplier) चुनते समय क्या ध्यान रखना चाहिए?", "options": ["क्वालिटी, डिलीवरी टाइम, ऑन-टाइम बैकअप और क्रेडिट टर्म्स", "केवल सबसे सस्ता दाम भले माल घटिया हो", "सप्लायर का सुंदर चेहरा", "सप्लायर का ऑफिस कितना बड़ा है"], "ans": 0, "exp": "केवल सस्ता माल देखने से क्वालिटी खराब हो सकती है। विश्वसनीयता और निरंतरता सबसे अहम है।"}, {"q": "24. बिजनेस में 'A/B Testing' का क्या मतलब है?", "options": ["दो अलग-अलग आइडिया/विज्ञापन को टेस्ट करके देखना कि कौन ज्यादा बिक्री दे रहा है", "स्कूल का एग्जाम लेना", "ए और बी सप्लायर से झगड़ा करना", "प्रोडक्ट का नाम A और B रखना"], "ans": 0, "exp": "A/B टेस्टिंग से डेटा आधारित फैसले लिए जाते हैं, जिससे मार्केटिंग का बजट सही जगह खर्च होता है।"}, {"q": "25. यदि कोई प्रोडक्ट लंबे समय से नहीं बिक रहा है (Slow Moving), तो क्या करें?", "options": ["बंडल ऑफर (Combo) या डिस्काउंट देकर कैपिटल क्लियर करें", "उसे और महंगे दाम पर बेचें", "उसे फेंक दें", "उसे छुपाकर रख दें"], "ans": 0, "exp": "डेड स्टॉक में फंसे पैसे को डिस्काउंट देकर निकालना और चालू स्टॉक में लगाना समझदारी है।"}, {"q": "26. बिजनेस में फ्रेंचाइजी (Franchise) मॉडल का मुख्य उद्देश्य क्या होता है?", "options": ["दूसरों के कैपिटल और नेटवर्क से बिजनेस का तेजी से विस्तार करना", "अपना बिजनेस दूसरों को मुफ्त में बेच देना", "बैंक लोन चुकाना", "दुकान का नाम बदलना"], "ans": 0, "exp": "फ्रेंचाइजी से ब्रांड वैल्यू और नेटवर्क तेजी से बढ़ता है बिना खुद का सारा पैसा लगाए।"}, {"q": "27. 'Word of Mouth' पब्लिसिटी कैसे हासिल की जाती है?", "options": ["ग्राहकों को उम्मीद से बेहतर सर्विस और बेहतरीन अनुभव देकर", "अखबार में गलत एड छपवाकर", "लोगों को पैसे देकर झूठी तारीफ करवाकर", "जबरदस्ती सामान बेचकर"], "ans": 0, "exp": "जब ग्राहक आपकी सर्विस से बेहद खुश होता है, तो वह खुद 10 लोगों को आपके पास भेजता है।"}, {"q": "28. 'Pricing Strategy' बनाते समय किन तीन चीज़ों का ध्यान रखना चाहिए?", "options": ["लागत (Cost), कंपटीटर का दाम (Competition) और ग्राहक की वैल्यू (Value)", "सिर्फ अपनी मर्जी", "पड़ोसी दुकानदार की सलाह", "सिर्फ सबसे महंगा दाम"], "ans": 0, "exp": "सही प्राइसिंग में प्रॉफिट मार्जिन भी बचता है और ग्राहक को कीमत के हिसाब से सही वैल्यू भी मिलती है।"}, {"q": "29. बिजनेस में 'Churn Rate' कम करने का क्या मतलब है?", "options": ["ग्राहकों का बिजनेस छोड़कर जाने की दर को कम करना", "मशीन की स्पीड बढ़ाना", "दूध से मक्खन निकालना", "नए कर्मचारी भर्ती करना"], "ans": 0, "exp": "कम चर्न रेट का मतलब है कि आपके ग्राहक आपके साथ लंबे समय तक बने हुए हैं।"}, {"q": "30. नया आउटलेट या शाखा (Branch) खोलने का सही समय कब है?", "options": ["जब पहला आउटलेट पूरी तरह प्रॉफिटेबल हो और उसकी SOP (प्रक्रिया) सेट हो चुकी हो", "पहले ही महीने में बिना प्रॉफिट के दूसरी दुकान खोलना", "जब कर्जा बहुत बढ़ गया हो", "सिर्फ दिखावे के लिए"], "ans": 0, "exp": "जब तक पहली ब्रांच ऑटो-पायलट और प्रॉफिटेबल न हो, नई ब्रांच खोलना जोखिम भरा है।"}, {"q": "31. 'KPI' (Key Performance Indicator) क्या होता है?", "options": ["बिजनेस और टीम की प्रगति मापने का लक्ष्य/पैमाना", "एक सरकारी लाइसेंस", "कंप्यूटर का पार्ट्स", "दुकान की चाबी"], "ans": 0, "exp": "KPI से पता चलता है कि कौन सा डिपार्टमेंट कितना लक्ष्य हासिल कर रहा है।"}, {"q": "32. बिजनेस में 'Pivot' करने का क्या अर्थ है?", "options": ["बाजार की मांग के अनुसार अपनी रणनीति या प्रोडक्ट में बदलाव करना", "बिजनेस पूरी तरह बंद कर देना", "कर्मचारियों को नौकरी से निकालना", "चोरी करना"], "ans": 0, "exp": "जब पुराना मॉडल न चले, तो समय रहते सही दिशा में बदलाव (Pivot) ही बिजनेस को बचाता है।"}, {"q": "33. 'Scalability' का क्या अर्थ है?", "options": ["लागत को बहुत बढ़ाए बिना बिक्री और ऑपरेशन्स को कई गुना बढ़ा पाना", "वजन नापने की मशीन", "सिर्फ एक ही शहर में सीमित रहना", "कर्मचारियों की संख्या घटाना"], "ans": 0, "exp": "स्केलेबल बिजनेस वह है जो 100 से 10,000 ग्राहकों तक आसानी से पहुँच सके।"}, {"q": "34. क्रेडिट कार्ड से पेमेंट स्वीकार करने का क्या फायदा है?", "options": ["ग्राहक आसानी से और बड़ा ऑर्डर दे पाते हैं (Increased Conversion)", "इसमें भारी नुकसान होता है", "बैंक पैसे जब्त कर लेता है", "कस्टमर गुस्सा हो जाते हैं"], "ans": 0, "exp": "डिजिटल पेमेंट ऑप्शंस से बिक्री बढ़ती है और कैश संभालने का झंझट खत्म होता है।"}, {"q": "35. बिजनेस में 'Bottleneck' क्या होता है?", "options": ["काम की प्रक्रिया में वह रुकावट जो पूरे सिस्टम को धीमा कर देती है", "पानी की बोतल", "कांच का सामान", "दुकान का ताला"], "ans": 0, "exp": "बॉटलनेक (जैसे धीमी पैकिंग या देर से अप्रूवल) को पहचानकर हटाना जरूरी है।"}, {"q": "36. ईमेल मार्केटिंग (Email Marketing) का क्या उपयोग है?", "options": ["मौजूदा ग्राहकों को नए ऑफर्स, अपडेट्स और पर्सनल कनेक्ट में रखना", "स्पैम मैसेज भेजकर परेशान करना", "कंप्यूटर हैक करना", "सिर्फ टाइम पास करना"], "ans": 0, "exp": "ईमेल मार्केटिंग का ROI सबसे ज्यादा माना जाता है अगर सही मैसेज भेजे जाएँ।"}, {"q": "37. 'LTV' (Life Time Value of Customer) क्या दर्शाती है?", "options": ["एक ग्राहक अपने पूरे समय में आपके बिजनेस को कुल कितना रेवेन्यू देता है", "कस्टमर की उम्र", "दुकान की उम्र", "प्रोडक्ट की एक्सपायरी डेट"], "ans": 0, "exp": "उच्च LTV वाले ग्राहकों पर ज्यादा मार्केटिंग बजट लगाना फायदेमंद होता है।"}, {"q": "38. 'Up-Selling' का क्या मतलब है?", "options": ["ग्राहक को उसकी पसंद से बेहतर और प्रीमियम मॉडल बेचना (जैसे 128GB की जगह 256GB फोन)", "सामान वापस लेना", "सस्ता सामान बेचना", "दुकान की छत पर बेचना"], "ans": 0, "exp": "अप-सेलिंग से प्रॉफिट मार्जिन बढ़ता है क्योंकि ग्राहक पहले से खरीदने के मूड में होता है।"}, {"q": "39. बिजनेस लीगल अनुपालन (GST, FSSAI, Trade License) क्यों जरूरी हैं?", "options": ["भारी पेनाल्टी और कानूनी कार्रवाई से बचने के लिए", "सिर्फ पैसे बर्बाद करने के लिए", "यह जरूरी नहीं है", "दुकान बंद करने के लिए"], "ans": 0, "exp": "समय पर लीगल कंप्लायंस पूरा करने से बिजनेस बिना किसी कानूनी अड़चन के शांति से चलता है।"}, {"q": "40. 'FMCG' प्रोडक्ट्स की क्या खूबी होती है?", "options": ["तेजी से बिकने वाले और रोजमर्रा इस्तेमाल होने वाले सामान (जैसे साबुन, बिस्किट)", "बहुत महंगे गहने", "भारी मशीनरी", "हवाई जहाज के पार्ट्स"], "ans": 0, "exp": "FMCG में मार्जिन कम होता है लेकिन वॉल्यूम बहुत ज्यादा होती है।"}, {"q": "41. 'SOP' (Standard Operating Procedure) का क्या फायदा है?", "options": ["आपकी गैर-मौजूदगी में भी टीम हर काम एक तय सही तरीके से कर पाती है", "काम धीमा हो जाता है", "कर्मचारी काम छोड़ देते हैं", "बिजनेस में घाटा होता है"], "ans": 0, "exp": "SOP से बिजनेस मालिक के बिना भी सिस्टम-ड्रिवन होकर सुचारू रूप से चलता है।"}, {"q": "42. 'Market Research' कब करनी चाहिए?", "options": ["बिजनेस शुरू करने से पहले और समय-समय पर मार्केट के बदलते ट्रेंड्स जानने के लिए", "बिजनेस बंद होने के बाद", "कभी नहीं", "केवल सपने देखने के समय"], "ans": 0, "exp": "मार्केट रिसर्च से ग्राहकों की बदलती जरूरतों का पहले ही पता चल जाता है।"}, {"q": "43. 'Omnichannel Strategy' का क्या मतलब है?", "options": ["ऑनलाइन वेबसाइट, ऐप और ऑफलाइन स्टोर सब जगह एक जैसा बेहतरीन अनुभव देना", "केवल टीवी पर एड देना", "दुकान बंद रखना", "सिर्फ एक ही जगह बेचना"], "ans": 0, "exp": "ऑम्नीचैनल से ग्राहक कहीं से भी खरीदे, उसे ब्रांड का एक जैसा अनुभव मिलता है।"}, {"q": "44. 'ROI' (Return On Investment) की सही परिभाषा क्या है?", "options": ["लगाए गए पैसे के मुकाबले मिला कुल नेट शुद्ध लाभ", "कुल नुकसान", "बैंक का ब्याज दर", "कर्मचारियों की संख्या"], "ans": 0, "exp": "ROI बताता है कि आपके निवेश ने आपको कितना फायदा कमाकर दिया।"}, {"q": "45. 'Crowdfunding' क्या होती है?", "options": ["इंटरनेट के जरिए आम जनता से छोटे-छोटे फंड जुटाकर प्रोजेक्ट शुरू करना", "बैंक में डकैती डालना", "रिश्तेदारों से झगड़ा करना", "सरकारी नौकरी पाना"], "ans": 0, "exp": "क्राउडफंडिंग से फंड भी मिलता है और प्रोडक्ट की मार्केट वैलिडेशन भी हो जाती है।"}, {"q": "46. बिजनेस में टाइम मैनेजमेंट (Time Management) के लिए किस सिद्धांत का पालन करना चाहिए?", "options": ["80/20 नियम (Pareto Principle) - 20% मुख्य कामों पर ध्यान देना जो 80% रिजल्ट देते हैं", "दिन भर छोटे-मोटे बेकार कामों में लगे रहना", "कोई टाइम टेबल न बनाना", "देर रात तक बेवजह जागना"], "ans": 0, "exp": "हाई-वैल्यू टास्क्स पर फोकस करने से कम समय में कई गुना ज्यादा ग्रोथ मिलती है।"}, {"q": "47. 'Freemium' बिजनेस मॉडल क्या होता है?", "options": ["बुनियादी सर्विस मुफ्त देना और एडवांस फीचर्स के लिए चार्ज करना", "सब कुछ हमेशा फ्री देना", "बिना बताए पैसे काट लेना", "सामान पर बैन लगा देना"], "ans": 0, "exp": "फ्रीमियम मॉडल से यूज़र्स तेजी से जुड़ते हैं और फिर कन्वर्ट होते हैं (जैसे Spotify, Canva)।"}, {"q": "48. 'Customer Acquisition Cost' (CAC) कैसे कम की जा सकती है?", "options": ["ऑर्गेनिक रीच, रेफ़रल प्रोग्राम और वफादार ग्राहकों की माउथ पब्लिसिटी से", "विज्ञापन का बजट 10 गुना बढ़ाकर", "क्वालिटी घटाकर", "दुकान का बोर्ड हटाकर"], "ans": 0, "exp": "जब मौजूदा ग्राहक नए ग्राहक लाते हैं तो नए कस्टमर लाने की लागत बहुत घट जाती है।"}, {"q": "49. बिजनेस में 'Vendor Lock-in' से बचने के लिए क्या करना चाहिए?", "options": ["एक ही वेंडर पर पूरी तरह निर्भर न रहकर बैकअप सप्लायर्स रखना", "एक ही सप्लायर से जीवन भर जुड़े रहना", "वेंडर से कभी बात न करना", "अकेले ही माल बनाना"], "ans": 0, "exp": "मल्टीपल सप्लायर्स रखने से आपकी सौदेबाजी की ताकत (Bargaining Power) मजबूत रहती है।"}, {"q": "50. एक सफल बिजनेसमैन (Business Master) की सबसे बड़ी खूबी क्या होती है?", "options": ["लगातार सीखना, गलतियों से सुधार करना और कभी हार न मानना (Resilience)", "थोड़े से फायदे पर घमंड करना", "दूसरों को नीचा दिखाना", "बदलाव से डरना"], "ans": 0, "exp": "मार्केट बदलता रहता है; जो उद्यमी लगातार सीखता है और फ्लेक्सिबल रहता है, वही लंबे समय तक राज करता है!"}];
+
+        // State Variables
+        let currentUser = null;
+        let currentQuestionIdx = 0;
+        let scoreCorrectCount = 0;
+        let scoreWrongCount = 0;
+
+        // DOM Elements
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        const completionScreen = document.getElementById('completionScreen');
+        const adminPanel = document.getElementById('adminPanel');
+
+        const inputName = document.getElementById('inputName');
+        const inputContact = document.getElementById('inputContact');
+        const startQuizBtn = document.getElementById('startQuizBtn');
+
+        const questionCounter = document.getElementById('questionCounter');
+        const progressBar = document.getElementById('progressBar');
+        const scoreCorrect = document.getElementById('scoreCorrect');
+        const scoreWrong = document.getElementById('scoreWrong');
+
+        const reactionBox = document.getElementById('reactionBox');
+        const correctReaction = document.getElementById('correctReaction');
+        const wrongReaction = document.getElementById('wrongReaction');
+
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const explanationBox = document.getElementById('explanationBox');
+        const expStatusHeader = document.getElementById('expStatusHeader');
+        const explanationText = document.getElementById('explanationText');
+        const nextBtn = document.getElementById('nextBtn');
+        const retakeQuizBtn = document.getElementById('retakeQuizBtn');
+
+        const finalCorrect = document.getElementById('finalCorrect');
+        const finalAccuracy = document.getElementById('finalAccuracy');
+
+        // Admin Elements
+        const adminLoginBtn = document.getElementById('adminLoginBtn');
+        const adminPinModal = document.getElementById('adminPinModal');
+        const adminPinInput = document.getElementById('adminPinInput');
+        const pinErrorMsg = document.getElementById('pinErrorMsg');
+        const submitPinBtn = document.getElementById('submitPinBtn');
+        const cancelPinBtn = document.getElementById('cancelPinBtn');
+        const closeAdminBtn = document.getElementById('closeAdminBtn');
+
+        const adminTotalUsers = document.getElementById('adminTotalUsers');
+        const adminCompletedUsers = document.getElementById('adminCompletedUsers');
+        const adminAvgScore = document.getElementById('adminAvgScore');
+        const adminTotalAttempts = document.getElementById('adminTotalAttempts');
+        const adminUserTableBody = document.getElementById('adminUserTableBody');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+
+        const confirmModal = document.getElementById('confirmModal');
+        const cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
+        const acceptConfirmBtn = document.getElementById('acceptConfirmBtn');
+
+        // Helper Toast Notification
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toastNotification');
+            const toastMessage = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMessage.textContent = msg;
+            toastIcon.className = isError ? 'fas fa-exclamation-circle text-rose-400 text-lg' : 'fas fa-info-circle text-blue-400 text-lg';
+
+            toast.classList.remove('translate-x-80', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-x-80', 'opacity-0');
+            }, 3500);
+        }
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            startQuizBtn.addEventListener('click', handleUserRegistration);
+            nextBtn.addEventListener('click', loadNextQuestion);
+            if (retakeQuizBtn) {
+                retakeQuizBtn.addEventListener('click', () => {
+                    completionScreen.classList.add('hidden');
+                    welcomeScreen.classList.remove('hidden');
+                    inputName.value = '';
+                    inputContact.value = '';
+                });
+            }
+
+            adminLoginBtn.addEventListener('click', () => {
+                adminPinInput.value = '';
+                pinErrorMsg.classList.add('hidden');
+                adminPinModal.classList.remove('hidden');
+            });
+
+            cancelPinBtn.addEventListener('click', () => {
+                adminPinModal.classList.add('hidden');
+            });
+
+            submitPinBtn.addEventListener('click', verifyAdminPin);
+
+            closeAdminBtn.addEventListener('click', () => {
+                adminPanel.classList.add('hidden');
+                if (currentUser && currentUser.status !== 'Completed 🎉') {
+                    quizScreen.classList.remove('hidden');
+                } else {
+                    welcomeScreen.classList.remove('hidden');
+                }
+            });
+
+            clearDataBtn.addEventListener('click', () => {
+                confirmModal.classList.remove('hidden');
+            });
+
+            cancelConfirmBtn.addEventListener('click', () => {
+                confirmModal.classList.add('hidden');
+            });
+
+            acceptConfirmBtn.addEventListener('click', () => {
+                confirmModal.classList.add('hidden');
+                localStorage.removeItem('bm_app_users');
+                renderAdminDashboard();
+                showToast('सारा यूज़र डेटा साफ़ कर दिया गया है!');
+            });
+        });
+
+        // Registration & Start Quiz
+        function handleUserRegistration() {
+            const name = inputName.value.trim();
+            const contact = inputContact.value.trim();
+
+            if (!name || !contact) {
+                showToast('कृपया अपना नाम और संपर्क (मोबाइल/ईमेल) दर्ज करें!', true);
+                return;
+            }
+
+            const userId = 'user_' + Date.now();
+            currentUser = {
+                id: userId,
+                name: name,
+                contact: contact,
+                startTime: new Date().toLocaleString('hi-IN'),
+                status: 'In Progress',
+                correct: 0,
+                wrong: 0,
+                totalAttempted: 0
+            };
+
+            saveUserToStorage(currentUser);
+
+            welcomeScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+
+            currentQuestionIdx = 0;
+            scoreCorrectCount = 0;
+            scoreWrongCount = 0;
+
+            loadQuestion(currentQuestionIdx);
+        }
+
+        // Load Question
+        function loadQuestion(idx) {
+            if (idx >= questionsData.length) {
+                showCompletionScreen();
+                return;
+            }
+
+            const q = questionsData[idx];
+
+            // Reset UI
+            reactionBox.classList.add('hidden');
+            correctReaction.classList.add('hidden');
+            wrongReaction.classList.add('hidden');
+            explanationBox.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+
+            questionCounter.textContent = `सवाल ${idx + 1} / ${questionsData.length}`;
+            const pct = ((idx) / questionsData.length) * 100;
+            progressBar.style.width = `${pct}%`;
+
+            scoreCorrect.textContent = scoreCorrectCount;
+            scoreWrong.textContent = scoreWrongCount;
+
+            questionText.textContent = q.q;
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((optText, optIdx) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 rounded-xl bg-slate-900 hover:bg-slate-700/80 border border-slate-700 transition-all font-medium text-sm text-slate-200 flex items-center justify-between group';
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-lg bg-slate-800 text-slate-400 group-hover:bg-blue-600 group-hover:text-white flex items-center justify-center font-bold text-xs shrink-0 transition-colors">
+                            ${String.fromCharCode(65 + optIdx)}
+                        </span>
+                        <span>${optText}</span>
+                    </div>
+                    <i class="fas fa-chevron-right text-xs text-slate-600 group-hover:text-slate-300"></i>
+                `;
+                btn.addEventListener('click', () => handleOptionClick(optIdx));
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        // Option Click Event
+        function handleOptionClick(selectedIdx) {
+            const q = questionsData[currentQuestionIdx];
+            const isCorrect = (selectedIdx === q.ans);
+
+            // Disable all option buttons
+            const optionBtns = optionsContainer.querySelectorAll('button');
+            optionBtns.forEach((btn, bIdx) => {
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-slate-700/80');
+
+                if (bIdx === q.ans) {
+                    btn.classList.add('bg-emerald-950/80', 'border-emerald-500', 'text-emerald-300');
+                    btn.querySelector('span').classList.add('bg-emerald-600', 'text-white');
+                } else if (bIdx === selectedIdx && !isCorrect) {
+                    btn.classList.add('bg-rose-950/80', 'border-rose-500', 'text-rose-300');
+                    btn.querySelector('span').classList.add('bg-rose-600', 'text-white');
+                } else {
+                    btn.classList.add('opacity-50');
+                }
+            });
+
+            // Update Score & Reaction Animation
+            reactionBox.classList.remove('hidden');
+
+            if (isCorrect) {
+                scoreCorrectCount++;
+                scoreCorrect.textContent = scoreCorrectCount;
+
+                correctReaction.classList.remove('hidden');
+                wrongReaction.classList.add('hidden');
+
+                // Trigger Confetti
+                if (window.confetti) {
+                    confetti({
+                        particleCount: 80,
+                        spread: 70,
+                        origin: { y: 0.6 }
+                    });
+                }
+            } else {
+                scoreWrongCount++;
+                scoreWrong.textContent = scoreWrongCount;
+
+                wrongReaction.classList.remove('hidden');
+                correctReaction.classList.add('hidden');
+            }
+
+            // Show Explanation
+            explanationBox.classList.remove('hidden');
+            if (isCorrect) {
+                expStatusHeader.className = 'text-sm font-bold text-emerald-400 flex items-center gap-2';
+                expStatusHeader.innerHTML = '<i class="fas fa-check-circle"></i> सही जवाब का विश्लेषण (Analysis):';
+            } else {
+                expStatusHeader.className = 'text-sm font-bold text-rose-400 flex items-center gap-2';
+                expStatusHeader.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ग़लत जवाब! सही उत्तर का कारण पढ़ें:';
+            }
+            explanationText.textContent = q.exp;
+
+            // Show Next Button
+            nextBtn.classList.remove('hidden');
+
+            // Update Current User Analytics
+            currentUser.correct = scoreCorrectCount;
+            currentUser.wrong = scoreWrongCount;
+            currentUser.totalAttempted = currentQuestionIdx + 1;
+            saveUserToStorage(currentUser);
+        }
+
+        // Load Next Question
+        function loadNextQuestion() {
+            currentQuestionIdx++;
+            loadQuestion(currentQuestionIdx);
+        }
+
+        // Show Completion Screen
+        function showCompletionScreen() {
+            quizScreen.classList.add('hidden');
+            completionScreen.classList.remove('hidden');
+
+            finalCorrect.textContent = `${scoreCorrectCount} / 50`;
+            const accuracy = Math.round((scoreCorrectCount / 50) * 100);
+            finalAccuracy.textContent = `${accuracy}%`;
+
+            currentUser.status = 'Completed 🎉';
+            currentUser.correct = scoreCorrectCount;
+            currentUser.wrong = scoreWrongCount;
+            currentUser.totalAttempted = 50;
+            saveUserToStorage(currentUser);
+
+            if (window.confetti) {
+                confetti({
+                    particleCount: 150,
+                    spread: 100,
+                    origin: { y: 0.5 }
+                });
+            }
+        }
+
+        // Local Storage Management for Admin Tracking
+        function getUsersFromStorage() {
+            try {
+                const data = localStorage.getItem('bm_app_users');
+                return data ? JSON.parse(data) : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function saveUserToStorage(userObj) {
+            let users = getUsersFromStorage();
+            const idx = users.findIndex(u => u.id === userObj.id);
+            if (idx >= 0) {
+                users[idx] = userObj;
+            } else {
+                users.push(userObj);
+            }
+            try {
+                localStorage.setItem('bm_app_users', JSON.stringify(users));
+            } catch (e) {}
+        }
+
+        // Verify Admin PIN Code
+        function verifyAdminPin() {
+            const pin = adminPinInput.value.trim();
+            if (pin === 'admin123') {
+                adminPinModal.classList.add('hidden');
+                welcomeScreen.classList.add('hidden');
+                quizScreen.classList.add('hidden');
+                completionScreen.classList.add('hidden');
+                adminPanel.classList.remove('hidden');
+
+                renderAdminDashboard();
+            } else {
+                pinErrorMsg.classList.remove('hidden');
+            }
+        }
+
+        // Render Owner Admin Dashboard
+        function renderAdminDashboard() {
+            const users = getUsersFromStorage();
+
+            adminTotalUsers.textContent = users.length;
+
+            const completedCount = users.filter(u => u.status.includes('Completed')).length;
+            adminCompletedUsers.textContent = completedCount;
+
+            let totalCorrectSum = 0;
+            let totalAttemptsSum = 0;
+
+            users.forEach(u => {
+                totalCorrectSum += (u.correct || 0);
+                totalAttemptsSum += (u.totalAttempted || 0);
+            });
+
+            const avgScoreVal = users.length > 0 ? (totalCorrectSum / users.length).toFixed(1) : '0';
+            adminAvgScore.textContent = `${avgScoreVal} / 50`;
+            adminTotalAttempts.textContent = totalAttemptsSum;
+
+            // Render Table
+            adminUserTableBody.innerHTML = '';
+
+            if (users.length === 0) {
+                adminUserTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="p-6 text-center text-slate-500">कोई यूज़र डेटा मौजूद नहीं है।</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            users.forEach((u, i) => {
+                const tr = document.createElement('tr');
+                tr.className = 'border-b border-slate-700/60 hover:bg-slate-700/30';
+
+                const pct = u.totalAttempted > 0 ? Math.round((u.correct / u.totalAttempted) * 100) : 0;
+                const statusBadge = u.status.includes('Completed')
+                    ? '<span class="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">पूरा किया</span>'
+                    : '<span class="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">चालू है</span>';
+
+                tr.innerHTML = `
+                    <td class="p-3 font-bold text-slate-400">${i + 1}</td>
+                    <td class="p-3 font-semibold text-white">${u.name}</td>
+                    <td class="p-3 text-slate-300">${u.contact}</td>
+                    <td class="p-3">${statusBadge}</td>
+                    <td class="p-3 text-emerald-400 font-bold">${u.correct || 0}</td>
+                    <td class="p-3 text-rose-400 font-bold">${u.wrong || 0}</td>
+                    <td class="p-3 font-bold text-blue-400">${pct}%</td>
+                    <td class="p-3 text-slate-400 text-[11px]">${u.startTime}</td>
+                `;
+                adminUserTableBody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
